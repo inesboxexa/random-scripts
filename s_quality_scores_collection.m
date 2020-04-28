@@ -1,5 +1,5 @@
 
-D = 'X:\Beatson\SLC7a5 study\AZ data\13C glutamine labelled\120um dpo\single ion images\testrow01NPLconvert\tissue only\no norm\U13C-glutamine SLC7a5';
+D = 'X:\Beatson\SLC7a5 study\AZ data\13C glutamine labelled\120um dpo\single ion images\testrow01NPLconvert\tissue only\RMS\U13C-glutamine SLC7a5';
 S = dir(fullfile(D,'*.png')); % pattern to match filenames.
 
 table = string([]);
@@ -16,16 +16,16 @@ for k = 1:numel(S)
 end
 cd(D)
 txt_row = strcat(repmat('%s\t',1,size(table,2)-1),'%s\n');
-fileID = fopen('quality_scores.txt','w');
+fileID = fopen('quality_scores_aux.txt','w');
 fprintf(fileID,txt_row, table');
 fclose(fileID);
 
 %%
 
-scores_file = 'X:\Beatson\SLC7a5 study\AZ data\13C glutamine labelled\120um dpo\single ion images\testrow01NPLconvert\tissue only\no norm\U13C-glutamine SLC7a5\quality_scores_final.txt';
+scores_file = 'X:\Beatson\SLC7a5 study\AZ data\13C glutamine labelled\120um dpo\single ion images\testrow01NPLconvert\tissue only\RMS\U13C-glutamine SLC7a5\quality_scores_final.txt';
 scores_struct = tdfread(scores_file,'\t');
 
-mean_intensity_table = 'X:\Beatson\SLC7a5 study\Rafas paper rebuttal\original\mean_intensities_aminoacids_az120umdata_no_norm_apc_apc-kras_unscored_table.xlsx';
+mean_intensity_table = 'X:\Beatson\SLC7a5 study\Rafas paper rebuttal\original\mean_intensities_heavylabelledmolecules_az120umdata_rms_apc_apc-kras_unscored_table.xlsx';
 [num,txt,raw] = xlsread(mean_intensity_table);
 
 scores_indexes = strcmpi(string(scores_struct.Final_Score),"Good");
@@ -40,6 +40,6 @@ end
 raw{1,col_num} = 'Quality';
 
 cd('X:\Beatson\SLC7a5 study\Rafas paper rebuttal\original\')
-xlswrite('mean_intensities_aminoacids_az120umdata_no_norm_apc_apc-kras_scored_table.xlsx',raw)
+xlswrite('mean_intensities_heavylabelledmolecules_az120umdata_rms_apc_apc-kras_scored_table.xlsx',raw)
 
 
