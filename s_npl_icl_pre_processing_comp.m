@@ -182,21 +182,57 @@ for set = 1:length(npl_mzindexes)
     
 end
 
-%%
+%% Drugs and related metabolites
 
-load('X:\Alex\Data study\CassetteDosed\dpo\spectra details\20160409_2h liver 16 heated neg Analyte 9\tissue only\datacube')
+% Brain
 
-npl_data = datacube.data;
-npl_mzvalues = datacube.spectralChannels;
-width = datacube.width;
-height = datacube.height;
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_brain_data.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_brain_mzvalues.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_brain_width.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_brain_height.mat')
 
-load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\CassetteResults-Neg.mat')
+npl_data = neg_brain_data;
+npl_mzvalues = neg_brain_mzvalues;
+npl_width = neg_brain_width;
+npl_height = neg_brain_height;
+
+
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\icl data processing outputs (h5 and mat files)\ICL-Brain-Neg.mat')
 
 icl_data = icl.sp;
 icl_mzvalues = icl.mz;
+icl_width = icl.sz(1);
+icl_height = icl.sz(2);
 
-% PDAC
+mkdir('D:\icl-npl data study\CassetteDosed\neg-brain-sii\')
+cd('D:\icl-npl data study\CassetteDosed\neg-brain-sii\')
+
+%%
+
+% Kidney
+
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_kidney_data.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_kidney_mzvalues.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_kidney_width.mat')
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\npl data processing outputs (mat files)\neg_kidney_height.mat')
+
+npl_data = neg_kidney_data;
+npl_mzvalues = neg_kidney_mzvalues;
+npl_width = npl_kidney_width;
+npl_height = npl_kidney_height;
+
+
+load('C:\Users\tm6\Documents\HCP Anywhere\CRUK Data processing study\CassetteDosed\icl data processing outputs (h5 and mat files)\ICL-Kidney-Neg.mat')
+
+icl_data = icl.sp;
+icl_mzvalues = icl.mz;
+icl_width = icl.sz(1);
+icl_height = icl.sz(2);
+
+mkdir('D:\icl-npl data study\CassetteDosed\neg-kidney-sii\')
+cd('D:\icl-npl data study\CassetteDosed\neg-kidney-sii\')
+
+%% PDAC
 
 % drugs = [ 475.0927, 454.9927, 493.1033, 489.1823, 461.2307, 479.2412, 453.2056, 497.2073, 443.2201, 435.195, 471.2162, 457.0821, 511.0694, 436.9822, 436.9822, 473.0033 ];
 
@@ -214,6 +250,8 @@ icl_mzvalues = icl.mz;
 % mkdir('X:\Alex\Data study\CassetteDosed\drugs\pos\')
 % cd('X:\Alex\Data study\CassetteDosed\drugs\pos\')
 
+%%
+
 % neg adducts
 
 drugs = [ ...
@@ -223,15 +261,12 @@ drugs = [ ...
     315.1285, 315.1285, 418.1784, 400.1678, 418.1784, ...
     400.1678, 400.1678, 488.317, 360.1354, 360.1354, ...
     504.6761, 486.6656, 522.6422, 522.6422, 468.655, ...
-    468.655 ...
+    468.655, 363.1051 ...
     ];
-
-mkdir('X:\Alex\Data study\CassetteDosed\drugs\neg\')
-cd('X:\Alex\Data study\CassetteDosed\drugs\neg\')
 
 %% Single ion images for drugs!
 
-for mz = drugs
+for mz = drugs(end)
     
     [ ~, npl_mz_index ] = min(abs(npl_mzvalues-mz));
     npl_ion_image = npl_data(:,npl_mz_index);
@@ -241,6 +276,14 @@ for mz = drugs
     
     scaled_npl_ion_image = (npl_ion_image-min(npl_ion_image(:)))./max(npl_ion_image(:)-min(npl_ion_image(:)));
     scaled_icl_ion_image = (icl_ion_image-min(icl_ion_image(:)))./max(icl_ion_image(:)-min(icl_ion_image(:)));
+    
+%     % Correction the different sizes!!!!
+%     
+%     icl_ion_image = icl_ion_image(1:end-icl_width,:);
+%     scaled_icl_ion_image = scaled_icl_ion_image(1:end-icl_width,:);
+    
+    width = npl_width;
+    height = npl_height;
     
     % Correlation
     
