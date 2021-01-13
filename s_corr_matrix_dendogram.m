@@ -9,6 +9,15 @@ load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 h
 load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\no norm\datacube_mzvalues_indexes')
 load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\spectra details\2019_10_09_PDX_BR1458_2_NEG_100ss Analyte 3\tissue only\datacubeonly_peakDetails')
 
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\tic\C')
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\tic\datacube_mzvalues_indexes')
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\spectra details\2019_10_09_PDX_BR1458_2_NEG_100ss Analyte 3\tissue only\datacubeonly_peakDetails')
+
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\RMS\C')
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\RMS\datacube_mzvalues_indexes')
+load('X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\spectra details\2019_10_09_PDX_BR1458_2_NEG_100ss Analyte 3\tissue only\datacubeonly_peakDetails')
+
+
 mz = datacubeonly_peakDetails(datacube_mzvalues_indexes,2);
 spectra = C';
 
@@ -32,18 +41,53 @@ h.YLabel = 'Cluster ID';
 
 % Dendrogram plots
 
-figure; 
-subplot(2,3,1); h = dendrogram(linkage(C,'single','euclidean')); title('euclidean'); grid on;
-subplot(2,3,2); h = dendrogram(linkage(C,'single','cosine')); title('cosine'); grid on;
-subplot(2,3,3); h = dendrogram(linkage(C,'single','correlation')); title('correlation'); grid on
+% Warning: Non-monotonic cluster tree -- the median linkage is probably not appropriate.
+% Warning: Non-monotonic cluster tree -- the centroid linkage is probably not appropriate.
 
-subplot(2,3,4); h = dendrogram(linkage(C,'weighted','euclidean')); title('euclidean'); grid on;
-subplot(2,3,5); h = dendrogram(linkage(C,'weighted','cosine')); title('cosine'); grid on;
-subplot(2,3,6); h = dendrogram(linkage(C,'weighted','correlation')); title('correlation'); grid on
+figure; 
+% subplot(3,4,1); h = dendrogram(linkage(C,'single','euclidean')); title('single - euclidean'); grid on;
+% subplot(3,4,2); h = dendrogram(linkage(C,'complete','euclidean')); title('complete - euclidean'); grid on;
+subplot(3,4,1); h = dendrogram(linkage(C,'average','euclidean')); title('average - euclidean'); grid on;
+subplot(3,4,2); h = dendrogram(linkage(C,'weighted','euclidean')); title('weighted - euclidean'); grid on;
+% subplot(3,5,4); h = dendrogram(linkage(C,'median','euclidean')); title('median - euclidean'); grid on;
+subplot(3,4,3); h = dendrogram(linkage(C,'centroid','euclidean')); title('centroid - euclidean'); grid on;
+subplot(3,4,4); h = dendrogram(linkage(C,'ward','euclidean')); title('ward - euclidean'); grid on;
+
+% subplot(3,4,1+4); h = dendrogram(linkage(C,'single','cosine')); title('single - cosine'); grid on;
+% subplot(3,4,2+4); h = dendrogram(linkage(C,'complete','cosine')); title('complete - cosine'); grid on;
+subplot(3,4,1+4); h = dendrogram(linkage(C,'average','cosine')); title('average - cosine'); grid on;
+subplot(3,4,2+4); h = dendrogram(linkage(C,'weighted','cosine')); title('weighted - cosine'); grid on;
+% subplot(3,5,4+5); h = dendrogram(linkage(C,'median','cosine')); title('median - cosine'); grid on;
+% subplot(3,5,5+5); h = dendrogram(linkage(C,'ward','cosine')); title('ward - cosine'); grid on;
+
+% subplot(3,4,1+8); h = dendrogram(linkage(C,'single','correlation')); title('single - correlation'); grid on;
+% subplot(3,4,2+8); h = dendrogram(linkage(C,'complete','correlation')); title('complete - correlation'); grid on;
+subplot(3,4,1+8); h = dendrogram(linkage(C,'average','correlation')); title('average - correlation'); grid on;
+subplot(3,4,2+8); h = dendrogram(linkage(C,'weighted','correlation')); title('weighted - correlation'); grid on;
+% subplot(3,5,4+10); h = dendrogram(linkage(C,'median','correlation')); title('median - correlation'); grid on;
+% subplot(3,5,5+10); h = dendrogram(linkage(C,'ward','correlation')); title('ward - correlation'); grid on;
 
 figure;
 hidx = cluster(linkage(C,'weighted','euclidean'),'criterion','distance','maxclust',4);
 
+figure;
+subplot(1,4,1)
+linkage_output = linkage(C,'single','cosine');
+[ H, T, outperm ] = dendrogram(linkage_output, 'Orientation', 'left');
+set(H,'color',[0 0 0])
+title('Dendogram (single linkage, cosine distance)'); 
+grid on;
+subplot(1,4,2:4)
+file = 'X:\ICR Breast PDX\Data Processing Outputs\pdx & primary tumours\mva 4000 highest peaks\neg desi 3d pdx & primary\tissue only\kmeans 20 components\no norm\clusters_table.txt';
+txt_row = strcat(repmat('%s\t',1,size(table,2)-1),'%s\n');        
+fileID = fopen(file,'r');
+table = fscanf(fileID,'%s\t');
+fclose(fileID);
+for row = 1:size(clusters_vs_samples,1)
+
+    clusterids = clusters_vs_samples.clusterId
+    
+end
 
 
 %%
