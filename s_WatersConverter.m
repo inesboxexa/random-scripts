@@ -1,4 +1,4 @@
-dataPath = 'X:\MSMS Imaging\MSMS\';
+dataPath = 'X:\Beatson\Intracolonic tumour study\Data\pos DESI\';
 WatersConvert = '"X:\WatersConvert\watersconvert.exe"';
 addpath(genpath('X:\WatersConvert\'));
 
