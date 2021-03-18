@@ -1,4 +1,4 @@
-dataPath = 'X:\Beatson\Intracolonic tumour study\Data\pos DESI\';
+dataPath = 'D:\veal-brain-homogenate-study\data\';
 WatersConvert = '"X:\WatersConvert\watersconvert.exe"';
 addpath(genpath('X:\WatersConvert\'));
 
