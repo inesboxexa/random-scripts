@@ -24,19 +24,19 @@
 % % (4) running a principal componenet analysis (PCA) using the intensities
 % % of the 500 most intense ions to visualise the trends across the samples
 
-%% Specifying the imzmls and ibds (data) location
+%%
+
+normalisation = "tic";
+
+%% Gathering the veal-brain-homogenate data
 
 % Please list the paths to all folders containing data.
 
-data_folders = { ...
-    'D:\veal-brain-homogenate-study\data\',...
-    };
+data_folders = { 'D:\veal-brain-homogenate-study\data\' };
 
 % Please list the strings that matches the names of the files to be analised. Each row should match each folder specified above. If all files need to be analised, please use '*'.
 
-dataset_name_portion = { 
-    '*',...
-    };
+dataset_name_portion = { '*' };
 
 % ! Please don't modify the code from here till end of this cell.
 
@@ -45,10 +45,6 @@ filesToProcess = []; for i = 1:length(data_folders); filesToProcess = [ filesToP
 % Defining the group of files of interest
 
 MyFilesInfo = filesToProcess([ 13 16 17 21 33 38 ]);
-
-%% Gathering the data
-
-normalisation = "zscore";
 
 dataMatrix = [];
 sample_ids = [];
@@ -60,6 +56,7 @@ for i = 1:size(MyFilesInfo,1)
     load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\' char(normalisation) filesep 'data' ]);
     load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\datacubeonly_peakDetails' ]);
     load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\width' ]);
+    load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\height' ]);
     load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\totalSpectrum_intensities' ]);
     load([ 'D:\veal-brain-homogenate-study\dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\no mask\totalSpectrum_mzvalues' ]);
     
@@ -92,6 +89,72 @@ end
 figure
 plot(spectra_mzs,spectraMatrix);
 legend({ '20201126-DESI-NEG-VBH-2x2-3','20201127-DESI-NEG-VBH-2x2-3','20201130-DESI-NEG-VBH-2x2','20201202-DESI-NEG-VBH-2x2-3','20201207-xDESI-V3-NEG-VBH','20201209-DESI-NEG-VBH-2x2-5' })
+
+%% Gathering the tumours data for the same dates
+
+data_type = 'tumours';
+
+% Please list the paths to all folders containing data.
+
+data_folders = { 
+    'D:\veal-brain-homogenate-study\tumours data\',...
+    };
+
+% Please list the strings that matches the names of the files to be analised. Each row should match each folder specified above. If all files need to be analised, please use '*'.
+
+dataset_name_portion = { '*' };
+
+% ! Please don't modify the code from here till end of this cell.
+
+filesToProcess = []; for i = 1:length(data_folders); filesToProcess = [ filesToProcess; dir([data_folders{i} filesep dataset_name_portion{i} '.imzML']) ]; end % Files and adducts information gathering
+
+% Defining the group of files of interest
+
+MyFilesInfo = filesToProcess([ ... ]);
+
+dataMatrix = [];
+sample_ids = [];
+figure;
+for i = 1:size(MyFilesInfo,1)
+    
+    file_name = strrep(MyFilesInfo(i).name(1:end-6), '_','-');
+    
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\' char(normalisation) filesep 'data' ]);
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\datacubeonly_peakDetails' ]);
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\width' ]);
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\height' ]);
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\totalSpectrum_intensities' ]);
+    load([ 'D:\veal-brain-homogenate-study\tumours dpo\spectra details' filesep MyFilesInfo(i).name(1:end-6) '\tissue only\totalSpectrum_mzvalues' ]);
+    
+    dataMatrix0 = data;
+    mzs0 = datacubeonly_peakDetails(:,2);
+    
+    if isempty(dataMatrix)
+        dataMatrix = dataMatrix0;
+        mzs = mzs0;
+        spectraMatrix = totalSpectrum_intensities';
+        spectra_mzs = totalSpectrum_mzvalues';
+    else
+        if size(dataMatrix,1)<size(dataMatrix0,1)
+            dataMatrix = cat(1,dataMatrix,NaN*ones(size(dataMatrix0,1)-size(dataMatrix,1),size(dataMatrix,2),size(ataMatrix,3)));
+        elseif size(dataMatrix,1)>size(dataMatrix0,1)
+            dataMatrix0 = cat(1,dataMatrix0,NaN*ones(size(dataMatrix,1)-size(dataMatrix0,1),size(dataMatrix,2),size(ataMatrix,3))
+        end
+        
+        dataMatrix = cat(3,dataMatrix,dataMatrix0);
+        mzs = [mzs,mzs0];
+        spectraMatrix = [spectraMatrix,totalSpectrum_intensities'];
+    end
+                        
+    % cv = std(dataMatrix0,1)./mean(dataMatrix0,1);
+    subplot(2,4,i)
+    tic_image = reshape(sum(data,2),width,height)';
+    imagesc(tic_image); axis image off; colorbar
+    title(file_name)
+    
+    sample_ids = [ sample_ids, string(file_name) ];
+            
+end
 
 %% Ploting the mean and median intensities of the 12 peaks selected as reference peaks by the experimentalist
 
@@ -135,9 +198,49 @@ peaksOfInterest_pc2 = [
     734.56
     ];
 
+peaksOfInterest_lowestp = [
+    500.278
+    235.168
+    244.136
+    290.1
+    736.644
+    679.504
+    737.646
+    460.304
+    680.508
+    582.28
+    329.192
+    677.49
+    690.532
+    528.308
+    356.262
+    897.752
+    717.562
+    731.114
+    440.264
+    973.782
+    734.56
+    708.61
+    ];
+
+peaksOfInterest_largestp = [
+   168.99
+   296.014
+   442.016
+   462.964
+   465.988
+   481.964
+   501.946
+   504.346
+   507.992
+   517.96
+   660.256
+   958.308
+    ];
+
 %%
 
-peaksOfInterest = peaksOfInterest_lipids;
+peaksOfInterest = peaksOfInterest_largestp;
 
 peaksOfInteresti = [];
 for peak = peaksOfInterest'
@@ -188,7 +291,19 @@ for peaki = 1:size(means,1)
     ylabel('ion counts')
     xlabel('sample')
     xticks(1:size(means,2))
-    xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
+    switch data_type
+        case 'vbh'
+            xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
+        case 'tumours'
+            xticklabels({...
+                '20201126','20201126','20201126','20201126','20201126','20201126','20201126',...
+                '20201127','20201127','20201127','20201127',...
+                '20201130',...
+                '20201202','20201202','20201202','20201202',...
+                '20201207','20201207','20201207',...
+                '20201209','20201209','20201209','20201209','20201209'
+                });
+    end
     xtickangle(45)
     if peaki == 4 % size(totalcount,1)
     legend({'mean','median','percentile 75','percentile 25'})
