@@ -6,20 +6,20 @@
 % % and after most of the sample of interest data, with the aim to understand
 % % the relationship between the drug intensity trends seen in the samples of
 % % interest with the intensity of severel ions in the homogenate.
-% 
+%
 % % It runs the following short data analysis pipeline:
-% % (1) definition of the groups of samples that need to be combined (e.g.: 
+% % (1) definition of the groups of samples that need to be combined (e.g.:
 % % all time points for each patient)
 % % (2) for each group of samples:
-% % (2.1) generating the SIMS-ToF total spectrum of each dataset within the 
-% % group, and summing them up to generate the representative total spectrum 
-% % for that group of samples (this step guaranties the same mass axis for 
+% % (2.1) generating the SIMS-ToF total spectrum of each dataset within the
+% % group, and summing them up to generate the representative total spectrum
+% % for that group of samples (this step guaranties the same mass axis for
 % % all SIMS-ToF datasets that need to be explored)
-% % (2.2) peak picking the representative SIMS-ToF total spectrum of a given 
+% % (2.2) peak picking the representative SIMS-ToF total spectrum of a given
 % % group of samples
 % % (2.3) generating the ion images for the most intense 500 ions, and
 % % gathering them in a unique matlab variable
-% % (3) look at the mean, median, percentile 25 and 75 of a list of 12 ions 
+% % (3) look at the mean, median, percentile 25 and 75 of a list of 12 ions
 % % (defined by the experimentalist) across the samples (e.g. time points)
 % % (4) running a principal componenet analysis (PCA) using the intensities
 % % of the 500 most intense ions to visualise the trends across the samples
@@ -29,6 +29,8 @@
 normalisation = "tic";
 
 %% Gathering the veal-brain-homogenate data
+
+data_type = 'vbh';
 
 % Please list the paths to all folders containing data.
 
@@ -73,7 +75,7 @@ for i = 1:size(MyFilesInfo,1)
         mzs = [mzs,mzs0];
         spectraMatrix = [spectraMatrix,totalSpectrum_intensities'];
     end
-                        
+    
     % cv = std(dataMatrix0,1)./mean(dataMatrix0,1);
     subplot(2,4,i)
     tic_image = reshape(sum(data,2),width,height)';
@@ -81,7 +83,7 @@ for i = 1:size(MyFilesInfo,1)
     title(file_name)
     
     sample_ids = [ sample_ids, string(file_name) ];
-            
+    
 end
 
 %%
@@ -96,7 +98,7 @@ data_type = 'tumours';
 
 % Please list the paths to all folders containing data.
 
-data_folders = { 
+data_folders = {
     'D:\veal-brain-homogenate-study\tumours data\',...
     };
 
@@ -110,7 +112,7 @@ filesToProcess = []; for i = 1:length(data_folders); filesToProcess = [ filesToP
 
 % Defining the group of files of interest
 
-MyFilesInfo = filesToProcess([ ... ]);
+MyFilesInfo = filesToProcess;
 
 dataMatrix = [];
 sample_ids = [];
@@ -136,24 +138,23 @@ for i = 1:size(MyFilesInfo,1)
         spectra_mzs = totalSpectrum_mzvalues';
     else
         if size(dataMatrix,1)<size(dataMatrix0,1)
-            dataMatrix = cat(1,dataMatrix,NaN*ones(size(dataMatrix0,1)-size(dataMatrix,1),size(dataMatrix,2),size(ataMatrix,3)));
+            dataMatrix = cat(1,dataMatrix,NaN*ones(size(dataMatrix0,1)-size(dataMatrix,1),size(dataMatrix,2),size(dataMatrix,3)));
         elseif size(dataMatrix,1)>size(dataMatrix0,1)
-            dataMatrix0 = cat(1,dataMatrix0,NaN*ones(size(dataMatrix,1)-size(dataMatrix0,1),size(dataMatrix,2),size(ataMatrix,3))
+            dataMatrix0 = cat(1,dataMatrix0,NaN*ones(size(dataMatrix,1)-size(dataMatrix0,1),size(dataMatrix0,2),size(dataMatrix0,3)));
         end
-        
         dataMatrix = cat(3,dataMatrix,dataMatrix0);
         mzs = [mzs,mzs0];
         spectraMatrix = [spectraMatrix,totalSpectrum_intensities'];
     end
-                        
+    
     % cv = std(dataMatrix0,1)./mean(dataMatrix0,1);
-    subplot(2,4,i)
+    subplot(5,5,i)
     tic_image = reshape(sum(data,2),width,height)';
     imagesc(tic_image); axis image off; colorbar
     title(file_name)
     
     sample_ids = [ sample_ids, string(file_name) ];
-            
+    
 end
 
 %% Ploting the mean and median intensities of the 12 peaks selected as reference peaks by the experimentalist
@@ -224,23 +225,23 @@ peaksOfInterest_lowestp = [
     ];
 
 peaksOfInterest_largestp = [
-   168.99
-   296.014
-   442.016
-   462.964
-   465.988
-   481.964
-   501.946
-   504.346
-   507.992
-   517.96
-   660.256
-   958.308
+    168.99
+    296.014
+    442.016
+    462.964
+    465.988
+    481.964
+    501.946
+    504.346
+    507.992
+    517.96
+    660.256
+    958.308
     ];
 
 %%
 
-peaksOfInterest = peaksOfInterest_largestp;
+peaksOfInterest = peaksOfInterest_lipids(1:12);
 
 peaksOfInteresti = [];
 for peak = peaksOfInterest'
@@ -306,9 +307,9 @@ for peaki = 1:size(means,1)
     end
     xtickangle(45)
     if peaki == 4 % size(totalcount,1)
-    legend({'mean','median','percentile 75','percentile 25'})
-    legend('boxoff')
-    legend('Location','best')
+        legend({'mean','median','percentile 75','percentile 25'})
+        legend('boxoff')
+        legend('Location','best')
     end
 end
 
@@ -328,8 +329,20 @@ bar(score(:,1:5),'EdgeColor',[1 1 1])
 legend({['PC 1 (', num2str(round(explained(1),2)) '% var expl)'], ['PC 2 (', num2str(round(explained(2),2)) '% var expl)'], ['PC 3 (', num2str(round(explained(3),2)) '% var expl)'], ['PC 4 (', num2str(round(explained(4),2)) '% var expl)'], ['PC 5 (', num2str(round(explained(5),2)) '% var expl)']});
 legend('boxoff')
 legend('Location','best')
-xticks(1:size(means,2))
-xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
+xticks(1:size(dataMatrix,3))
+switch data_type
+    case 'vbh'
+        xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
+    case 'tumours'
+        xticklabels({...
+            '20201126','20201126','20201126','20201126','20201126','20201126','20201126',...
+            '20201127','20201127','20201127','20201127',...
+            '20201130',...
+            '20201202','20201202','20201202','20201202',...
+            '20201207','20201207','20201207',...
+            '20201209','20201209','20201209','20201209','20201209'
+            });
+end
 xtickangle(45)
 grid on
 xlabel('sample')
@@ -341,3 +354,30 @@ plot(mzs0,coeff(:,[1 2]))
 %%
 
 [ ~, pc2_peaksOfInteresti ] = sort(abs(coeff(:,2)),'descend');
+
+%%
+
+figure; 
+hold on
+data4pca = squeeze(mean(dataMatrix,1,'omitnan'))';
+data4pca = (data4pca-mean(data4pca,'omitnan'))./std(data4pca(sum(~isnan(data4pca)==0,2)==0,:));
+plot(mean(data4pca,2)', 'k', 'linewidth',3)
+%plot(mean(squeeze(sum(dataMatrix,2)),1), 'b', 'linewidth',3)
+xticks(1:size(dataMatrix,3))
+switch data_type
+    case 'vbh'
+        xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
+    case 'tumours'
+        xticklabels({...
+            '20201126','20201126','20201126','20201126','20201126','20201126','20201126',...
+            '20201127','20201127','20201127','20201127',...
+            '20201130',...
+            '20201202','20201202','20201202','20201202',...
+            '20201207','20201207','20201207',...
+            '20201209','20201209','20201209','20201209','20201209'
+            });
+end
+xtickangle(45)
+grid on
+xlabel('sample')
+ylabel('TIC')
