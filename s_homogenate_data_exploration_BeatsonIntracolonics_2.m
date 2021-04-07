@@ -484,7 +484,7 @@ peaksOfInterest_specialList = [
 %%
 
 peaksOfInteresti = 0;
-for peak = peaksOfInterest_specialList'
+for peak = peaksOfInterest_lipids'
     [~, index] = ismembertol(mzs0,peak,1e-8);
     disp(sum(index))
     peaksOfInteresti = peaksOfInteresti+index;
@@ -496,12 +496,19 @@ peaksOfInteresti = peaksOfInteresti(1:6);
 % Update data and spectral channels
 
 dataMatrix2plot = dataMatrix(:,peaksOfInteresti,:);
+% dataMatrix2plot = dataMatrix(:,152,:)./dataMatrix(:,112,:); % Ratio
 mzs2plot = mzs0(peaksOfInteresti);
+% mzs2plot = mzs0(152)/mzs0(112); % Ratio
 
 means = squeeze(mean(dataMatrix2plot(:,:,:),1,'omitnan'));
 medians = squeeze(median(dataMatrix2plot(:,:,:),1,'omitnan'));
 prctile75 = squeeze(prctile(dataMatrix2plot(:,:,:),75,1));
 prctile25 = squeeze(prctile(dataMatrix2plot(:,:,:),25,1));
+
+% means = squeeze(mean(dataMatrix2plot(:,:,:),1,'omitnan'))'; % Ratio
+% medians = squeeze(median(dataMatrix2plot(:,:,:),1,'omitnan'))'; % Ratio
+% prctile75 = squeeze(prctile(dataMatrix2plot(:,:,:),75,1))'; % Ratio
+% prctile25 = squeeze(prctile(dataMatrix2plot(:,:,:),25,1))'; % Ratio
 
 colors = viridis(5);
 colors(1,:) = [0 0 0];
@@ -560,29 +567,28 @@ end
 colors = tab10;
 figure
 data4pca = squeeze(mean(dataMatrix,1,'omitnan'))';
+data4pca(:,sum(isnan(data4pca))>0) = [];
 data4pca = (data4pca-mean(data4pca,'omitnan'))./std(data4pca(sum(~isnan(data4pca)==0,2)==0,:));
 [coeff,score,latent,tsquared,explained,mu] = pca(data4pca);
 bar(score(:,1:5),'EdgeColor',[1 1 1])
-% stem(1:size(data4pca,1),score(:,1),'-o','color', colors(1,:),'MarkerEdgeColor',colors(1,:),'MarkerFaceColor',colors(1,:))
-% stem(1:size(data4pca,1),score(:,2),'-o','color', colors(3,:),'MarkerEdgeColor',colors(3,:),'MarkerFaceColor',colors(3,:))
-% stem(1:size(data4pca,1),score(:,3),'-o','color', colors(5,:),'MarkerEdgeColor',colors(5,:),'MarkerFaceColor',colors(5,:))
-% stem(1:size(data4pca,1),score(:,4),'-o','color', colors(7,:),'MarkerEdgeColor',colors(7,:),'MarkerFaceColor',colors(7,:))
-% stem(1:size(data4pca,1),score(:,5),'-o','color', colors(9,:),'MarkerEdgeColor',colors(9,:),'MarkerFaceColor',colors(9,:))
+hold on
+stem([3.5:3:20], 2*max(abs(score(:)))*ones(1,6),'k')
+stem([3.5:3:20], -2*max(abs(score(:)))*ones(1,6),'k')
+axis([0 length(replicate_id)+1 1.1*min(score(:)) 1.1*max(score(:))])
 legend({['PC 1 (', num2str(round(explained(1),2)) '% var expl)'], ['PC 2 (', num2str(round(explained(2),2)) '% var expl)'], ['PC 3 (', num2str(round(explained(3),2)) '% var expl)'], ['PC 4 (', num2str(round(explained(4),2)) '% var expl)'], ['PC 5 (', num2str(round(explained(5),2)) '% var expl)']});
 legend('boxoff')
 legend('Location','best')
 xticks(1:size(dataMatrix,3))
 switch data_type
-    case 'vbh'
-        xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
-    case 'tumours'
+    case 'vbh & tumours'
         xticklabels({...
-            '20201126','20201126','20201126','20201126','20201126','20201126','20201126',...
-            '20201127','20201127','20201127','20201127',...
-            '20201130',...
-            '20201202','20201202','20201202','20201202',...
-            '20201207','20201207','20201207',...
-            '20201209','20201209','20201209','20201209','20201209'
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','7-Dec',...
             });
 end
 xtickangle(45)
@@ -591,7 +597,7 @@ xlabel('sample')
 ylabel('score')
 
 figure
-plot(mzs0,coeff(:,[1 2]))
+plot(mzs0(sum(isnan(data4pca))==0),coeff(:,[1 2]))
 
 %%
 
@@ -607,16 +613,15 @@ plot(mean(data4pca,2)', 'k', 'linewidth',3)
 %plot(mean(squeeze(sum(dataMatrix,2)),1), 'b', 'linewidth',3)
 xticks(1:size(dataMatrix,3))
 switch data_type
-    case 'vbh'
-        xticklabels({'20201126','20201127','20201130','20201202','20201207','20201209'});
-    case 'tumours'
+    case 'vbh & tumours'
         xticklabels({...
-            '20201126','20201126','20201126','20201126','20201126','20201126','20201126',...
-            '20201127','20201127','20201127','20201127',...
-            '20201130',...
-            '20201202','20201202','20201202','20201202',...
-            '20201207','20201207','20201207',...
-            '20201209','20201209','20201209','20201209','20201209'
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','2-Dec','7-Dec',...
+            '27-Nov','7-Dec',...
             });
 end
 xtickangle(45)
