@@ -1,4 +1,7 @@
 
+% This script creates new small masks with background (to plot single ion
+% images).
+
 cd('X:\Beatson\Intracolonic tumour study\dpo\neg DESI\rois')
 
 files = dir('*slide9*');
